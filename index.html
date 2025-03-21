@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>URL Redirect Checker</title>
+</head>
+<body>
+  <h1>URL Accessibility Checker</h1>
+  <form id="urlForm">
+    <label for="url">Enter a URL:</label>
+    <input type="url" id="url" name="url" required>
+    <button type="submit">Check URL</button>
+  </form>
+
+  <script>
+    // Handle the form submission
+    document.getElementById('urlForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const url = document.getElementById('url').value;
+
+      if (!url) {
+        alert('Please enter a valid URL.');
+        return;
+      }
+
+      try {
+        // Send a request to check the URL accessibility
+        const response = await fetch(`/check-link?url=${encodeURIComponent(url)}`);
+
+        // If the redirect happens, the browser will automatically go there.
+        if (!response.ok) {
+          alert('Something went wrong while checking the URL.');
+        }
+      } catch (error) {
+        alert('Error checking the URL.');
+      }
+    });
+  </script>
+</body>
+</html>
