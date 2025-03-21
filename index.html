@@ -7,40 +7,43 @@
 </head>
 <body>
   <h1>Check URL Accessibility</h1>
-  <form id="urlForm">
-    <label for="url">Enter a URL:</label>
-    <input type="url" id="url" name="url" required placeholder="https://example.com">
-    <button type="submit">Check URL</button>
-  </form>
-
+  <p id="message">Checking URL...</p>  <!-- Message to show the user that we're checking the URL -->
+  
   <script>
     // Fallback URL in case the provided URL is not accessible
-    const fallbackUrl = 'https://google.com';  // You can replace this with your desired fallback link
+    const fallbackUrl = 'https://example.com';  // You can replace this with your desired fallback link
 
-    document.getElementById('urlForm').addEventListener('submit', async (event) => {
-      event.preventDefault();
+    // Function to get URL parameters
+    function getQueryParameter(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
 
-      const url = document.getElementById('url').value.trim();
+    // Extract the URL from the query parameters
+    const url = getQueryParameter('url');
 
-      if (!url) {
-        alert('Please enter a valid URL.');
-        return;
-      }
+    if (url) {
+      // If the URL is provided in the query parameter, we will check its accessibility
+      document.getElementById('message').textContent = `Checking accessibility of: ${url}`;
 
-      try {
-        // Attempt to fetch the URL using Fetch API
-        const response = await fetch(url, {
-          method: 'HEAD',  // Use HEAD to avoid downloading content
-          mode: 'no-cors'  // Allows the fetch to work with external sites without CORS issues
-        });
-
-        // If we reach here, the URL is likely accessible from the user's network
-        window.location.href = url;  // Redirect to the entered URL if accessible
-      } catch (error) {
+      // Attempt to fetch the URL using Fetch API
+      fetch(url, {
+        method: 'HEAD',  // Use HEAD to avoid downloading content
+        mode: 'no-cors'  // Allows the fetch to work with external sites without CORS issues
+      })
+      .then(response => {
+        // If the request is successful, redirect to the given URL
+        window.location.href = url;
+      })
+      .catch(error => {
         console.log('Error accessing the URL:', error);
-        window.location.href = fallbackUrl;  // Redirect to fallback URL if not accessible
-      }
-    });
+        // If the request fails, redirect to the fallback URL
+        window.location.href = fallbackUrl;
+      });
+    } else {
+      // If no URL is provided, display an error message
+      document.getElementById('message').textContent = 'No URL provided in the query parameter.';
+    }
   </script>
 </body>
 </html>
