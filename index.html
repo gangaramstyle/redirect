@@ -3,22 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>URL Redirect Checker</title>
+  <title>Network Accessibility Check</title>
 </head>
 <body>
-  <h1>URL Accessibility Checker</h1>
+  <h1>Check URL Accessibility</h1>
   <form id="urlForm">
     <label for="url">Enter a URL:</label>
-    <input type="url" id="url" name="url" required>
+    <input type="url" id="url" name="url" required placeholder="https://example.com">
     <button type="submit">Check URL</button>
   </form>
 
   <script>
-    // Handle the form submission
+    // Fallback URL in case the provided URL is not accessible
+    const fallbackUrl = 'https://example.com';  // You can replace this with your desired fallback link
+
     document.getElementById('urlForm').addEventListener('submit', async (event) => {
       event.preventDefault();
 
-      const url = document.getElementById('url').value;
+      const url = document.getElementById('url').value.trim();
 
       if (!url) {
         alert('Please enter a valid URL.');
@@ -26,15 +28,17 @@
       }
 
       try {
-        // Send a request to check the URL accessibility
-        const response = await fetch(`/check-link?url=${encodeURIComponent(url)}`);
+        // Attempt to fetch the URL using Fetch API
+        const response = await fetch(url, {
+          method: 'HEAD',  // Use HEAD to avoid downloading content
+          mode: 'no-cors'  // Allows the fetch to work with external sites without CORS issues
+        });
 
-        // If the redirect happens, the browser will automatically go there.
-        if (!response.ok) {
-          alert('Something went wrong while checking the URL.');
-        }
+        // If we reach here, the URL is likely accessible from the user's network
+        window.location.href = url;  // Redirect to the entered URL if accessible
       } catch (error) {
-        alert('Error checking the URL.');
+        console.log('Error accessing the URL:', error);
+        window.location.href = fallbackUrl;  // Redirect to fallback URL if not accessible
       }
     });
   </script>
